@@ -128,12 +128,10 @@ class AntiNukeManager {
       const embed = new MessageEmbed()
         .setTitle(`🚨 Anti-Nuke Alert - ${statusText}`)
         .setDescription(
-          `**Server**: ${guild ? guild.name : guildId}\n**User**: ${
-            user ? user.tag : userId
+          `**Server**: ${guild ? guild.name : guildId}\n**User**: ${user ? user.tag : userId
           }\n**Action**: ${actionType
             .replace(/([A-Z])/g, " $1")
-            .toLowerCase()}\n**Progress**: ${currentCount}/${threshold} (${percentage}%)\n**Status**: ${
-            currentCount >= threshold ? "ACTION TAKEN" : "APPROACHING THRESHOLD"
+            .toLowerCase()}\n**Progress**: ${currentCount}/${threshold} (${percentage}%)\n**Status**: ${currentCount >= threshold ? "ACTION TAKEN" : "APPROACHING THRESHOLD"
           }`
         )
         .setColor(0x8b5cf6)
@@ -281,7 +279,7 @@ class AntiNukeManager {
       }
 
       const requiredPerm =
-        punishment === "ban" ? "BAN_MEMBERS" : punishment === "kick" ? "KICK_MEMBERS" : "MANAGE_ROLES";
+        punishment === "ban" ? "BAN_MEMBERS" : "KICK_MEMBERS";
       if (
         !botMember.permissions.has(requiredPerm) &&
         !botMember.permissions.has("ADMINISTRATOR")
@@ -304,6 +302,16 @@ class AntiNukeManager {
       const fullReason = `[AntiNuke] ${reason}`;
       let actionMessage = "";
 
+      try {
+        const dmMessage = `⚠️ **You are being punished in ${guild.name} for Anti-Nuke violations.**\n**Reason:** ${reason}`;
+        await RateLimitManager.execute(
+          `guild.${guildId}.members.dm.${userId}`,
+          async () => await member.send(dmMessage),
+          [],
+          { retryLimit: 1 }
+        ).catch(() => null);
+      } catch (e) {}
+
       if (punishment === "ban") {
         await RateLimitManager.execute(
           `guild.${guildId}.members.ban`,
@@ -322,24 +330,6 @@ class AntiNukeManager {
         );
         Logger.success(`Kicked ${member.user.tag} (${member.id}): ${reason}`);
         actionMessage = "Kicked";
-      } else if (punishment === "strip") {
-        const rolesToRemove = member.roles.cache.filter(role => 
-          role.id !== guildId && 
-          !role.managed && 
-          role.position < botMember.roles.highest.position
-        );
-        await RateLimitManager.execute(
-          `guild.${guildId}.members.strip`,
-          async () => {
-             if (rolesToRemove.size > 0) {
-               await member.roles.remove(rolesToRemove, fullReason);
-             }
-          },
-          [],
-          { retryLimit: 3 }
-        );
-        Logger.success(`Stripped roles from ${member.user.tag} (${member.id}): ${reason}`);
-        actionMessage = "Roles Removed";
       } else if (punishment === "none") {
         Logger.warn(
           `Detected malicious activity: ${member.user.tag}: ${reason}`
@@ -376,11 +366,9 @@ class AntiNukeManager {
   async notifyOwnersSafe(guild, member, action, reason) {
     if (global.config?.logs?.log_owner_dm !== true) return;
 
-    const message = `🛡️ **ANTI-NUKE ACTION TAKEN**\n**Server:** ${
-      guild.name
-    }\n**User:** ${member.user.tag} (${
-      member.id
-    })\n**Action:** ${action.toUpperCase()}\n**Reason:** ${reason}\n**Time:** ${new Date().toISOString()}`;
+    const message = `🛡️ **ANTI-NUKE ACTION TAKEN**\n**Server:** ${guild.name
+      }\n**User:** ${member.user.tag} (${member.id
+      })\n**Action:** ${action.toUpperCase()}\n**Reason:** ${reason}\n**Time:** ${new Date().toISOString()}`;
     const owners = WhitelistManager.getAllOwners();
 
     for (const ownerId of owners) {
@@ -398,7 +386,7 @@ class AntiNukeManager {
           [],
           { retryLimit: 2 }
         );
-      } catch (error) {}
+      } catch (error) { }
     }
   }
 

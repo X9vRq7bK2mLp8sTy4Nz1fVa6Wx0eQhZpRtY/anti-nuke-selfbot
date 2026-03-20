@@ -74,6 +74,12 @@ class RateLimitManager {
           continue;
         }
 
+        if (error.code === 403 || error.code === 404 || error.code === 50001 || error.code === 10007 || error.status === 403 || error.status === 404 || error.code === 50013) {
+          this.pendingRequests[routeId] = false;
+          this.processQueue(routeId);
+          throw error;
+        }
+
         if (retries < retryLimit) {
           const backoff = Math.min(
             maxBackoff,

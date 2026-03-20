@@ -74,9 +74,9 @@ class Logger {
       for (const ownerId of owners) {
         if (!ownerId || ownerId === global.client.user?.id) continue;
         const owner = await global.client.users.fetch(ownerId).catch(() => null);
-        if (owner) await owner.send(message).catch(() => {});
+        if (owner) await owner.send(message).catch(() => { });
       }
-    } catch (e) {}
+    } catch (e) { }
   }
 
   shouldLog(level) {
