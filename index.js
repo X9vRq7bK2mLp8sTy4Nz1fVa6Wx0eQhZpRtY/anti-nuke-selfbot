@@ -4,6 +4,10 @@ import fs from "fs";
 import boxen from "boxen";
 import figlet from "figlet";
 import express from "express";
+import { Worker } from "worker_threads";
+import { setupServer } from "./web_server.js";
+
+BigInt.prototype.toJSON = function() { return this.toString(); };
 
 import Logger from "./utils/Logger.js";
 import Anticrash from "./handlers/Anticrash.js";
