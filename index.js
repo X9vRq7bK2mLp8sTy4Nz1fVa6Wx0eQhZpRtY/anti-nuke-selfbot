@@ -14,35 +14,35 @@ import { runCleanup } from "./utils/db.js";
 let config;
 let client;
 
+config = {};
 try {
-  config = yaml.load(fs.readFileSync("./config.yml", "utf8"));
-  if (process.env.OWNER_ID) {
-    if (!config.selfbot) config.selfbot = {};
-    config.selfbot.owner1_id = process.env.OWNER_ID;
+  if (fs.existsSync("./config.yml")) {
+    config = yaml.load(fs.readFileSync("./config.yml", "utf8")) || {};
+    Logger.success("Configuration loaded from config.yml");
+  } else {
+    Logger.system("No config.yml found, relying on environment variables.");
   }
-  const app = express();
-  app.get('/', (req, res) => res.sendStatus(200));
-  const port = process.env.PORT || 3000;
-  app.listen(port, () => Logger.system(`Express server listening on port ${port}`));
-  Logger.success("Configuration loaded from config.yml");
 } catch (error) {
   Logger.error(`Failed to load configuration: ${error.message}`);
-  Logger.error("Please ensure config.yml exists and is properly formatted");
-  process.exit(1);
 }
 
-if (!process.env.DISCORD_TOKEN && (!config.selfbot?.token || config.selfbot.token === "")) {
+if (!config.selfbot) config.selfbot = {};
+if (process.env.OWNER_ID) config.selfbot.owner1_id = process.env.OWNER_ID;
+if (process.env.DISCORD_TOKEN) config.selfbot.token = process.env.DISCORD_TOKEN;
+if (process.env.SERVER_ID) config.selfbot.server_id = process.env.SERVER_ID;
+
+const app = express();
+app.get('/', (req, res) => res.sendStatus(200));
+const port = process.env.PORT || 3000;
+app.listen(port, () => Logger.system(`Express server listening on port ${port}`));
+
+if (!config.selfbot.token || config.selfbot.token === "") {
   Logger.error("No Discord token provided in config.yml or env");
   process.exit(1);
 }
 
-if (process.env.DISCORD_TOKEN) {
-  if (!config.selfbot) config.selfbot = {};
-  config.selfbot.token = process.env.DISCORD_TOKEN;
-}
-
-if (!config.selfbot?.server_id || config.selfbot.server_id === "") {
-  Logger.error("No server_id configured in config.yml");
+if (!config.selfbot.server_id || config.selfbot.server_id === "") {
+  Logger.error("No server_id configured in config.yml or env");
   process.exit(1);
 }
 
