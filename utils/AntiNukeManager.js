@@ -47,11 +47,11 @@ class AntiNukeManager {
     return global.config?.antinuke_settings?.recovery_delay || 1500;
   }
 
-  cleanupActionData(actionType, userId, guildId) {
+  async cleanupActionData(actionType, userId, guildId) {
     await db.clearUserActions(userId, guildId, actionType);
   }
 
-  recordAction(actionType, userId, guildId, forceThreshold = false) {
+  async recordAction(actionType, userId, guildId, forceThreshold = false) {
     if (this.isUserBeingProcessed(userId)) {
       Logger.debug(
         `User ${userId} already being processed - skipping ${actionType}`
@@ -425,7 +425,7 @@ class AntiNukeManager {
     });
   }
 
-  markOperationComplete(userId) {
+  async markOperationComplete(userId) {
     const operation = this.activeOperations.get(userId);
     if (operation) {
       operation.status = "completed";

@@ -4,7 +4,7 @@ import Logger from "../../utils/Logger.js";
 export default {
   name: "guildMemberAdd",
   once: false,
-  execute(client, member) {
+  async execute(client, member) {
     if (!member.user?.bot) return;
     if (!AntiNukeManager.isProtectedServer(member.guild.id)) return;
 
