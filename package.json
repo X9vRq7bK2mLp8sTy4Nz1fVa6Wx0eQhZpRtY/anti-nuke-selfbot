@@ -1,0 +1,25 @@
+{
+  "name": "vantrix",
+  "version": "1.2.0",
+  "description": "Advanced Discord Anti-Nuke Selfbot with Vanity URL Protection",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "keywords": [],
+  "author": "github.com/faiz4sure",
+  "license": "GPL-3.0",
+  "type": "module",
+  "dependencies": {
+    "boxen": "^8.0.1",
+    "debug": "^4.4.3",
+    "discord.js-selfbot-v13": "^3.7.1",
+    "figlet": "^1.9.3",
+    "js-yaml": "^4.1.0",
+    "kleur": "^4.1.5",
+    "mongoose": "^8.3.0",
+    "express": "^4.19.2",
+    "terminal-kit": "^3.1.2"
+  }
+}
