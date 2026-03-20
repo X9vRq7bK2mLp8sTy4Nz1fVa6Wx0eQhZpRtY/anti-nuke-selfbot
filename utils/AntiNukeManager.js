@@ -330,6 +330,24 @@ class AntiNukeManager {
         );
         Logger.success(`Kicked ${member.user.tag} (${member.id}): ${reason}`);
         actionMessage = "Kicked";
+      } else if (punishment === "strip") {
+        const rolesToRemove = member.roles.cache.filter(role => 
+          role.id !== guildId && 
+          !role.managed && 
+          role.position < botMember.roles.highest.position
+        );
+        await RateLimitManager.execute(
+          `guild.${guildId}.members.strip`,
+          async () => {
+             if (rolesToRemove.size > 0) {
+               await member.roles.remove(rolesToRemove, fullReason);
+             }
+          },
+          [],
+          { retryLimit: 3 }
+        );
+        Logger.success(`Stripped roles from ${member.user.tag} (${member.id}): ${reason}`);
+        actionMessage = "Roles Removed";
       } else if (punishment === "none") {
         Logger.warn(
           `Detected malicious activity: ${member.user.tag}: ${reason}`
@@ -364,7 +382,7 @@ class AntiNukeManager {
   }
 
   async notifyOwnersSafe(guild, member, action, reason) {
-    if (global.config?.logs?.log_owner_dm !== true) return;
+    if (global.config?.logs?.log_owner_dm === false) return;
 
     const message = `🛡️ **ANTI-NUKE ACTION TAKEN**\n**Server:** ${guild.name
       }\n**User:** ${member.user.tag} (${member.id
