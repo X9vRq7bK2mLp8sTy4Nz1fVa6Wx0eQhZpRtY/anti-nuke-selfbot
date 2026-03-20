@@ -281,7 +281,7 @@ class AntiNukeManager {
       }
 
       const requiredPerm =
-        punishment === "ban" ? "BAN_MEMBERS" : "KICK_MEMBERS";
+        punishment === "ban" ? "BAN_MEMBERS" : punishment === "kick" ? "KICK_MEMBERS" : "MANAGE_ROLES";
       if (
         !botMember.permissions.has(requiredPerm) &&
         !botMember.permissions.has("ADMINISTRATOR")
@@ -322,6 +322,15 @@ class AntiNukeManager {
         );
         Logger.success(`Kicked ${member.user.tag} (${member.id}): ${reason}`);
         actionMessage = "Kicked";
+      } else if (punishment === "strip") {
+        await RateLimitManager.execute(
+          `guild.${guildId}.members.strip`,
+          async () => await member.roles.set([], fullReason),
+          [],
+          { retryLimit: 3 }
+        );
+        Logger.success(`Stripped roles from ${member.user.tag} (${member.id}): ${reason}`);
+        actionMessage = "Roles Removed";
       } else if (punishment === "none") {
         Logger.warn(
           `Detected malicious activity: ${member.user.tag}: ${reason}`

@@ -67,9 +67,13 @@ Logger.info(`Configured ${owners.length} owner(s) for notifications`);
 
 Anticrash.init();
 
-const statusType = config.status?.type || "dnd";
+const statusType = process.env.STATUS || config.status?.type || "invisible";
 const validStatuses = ["online", "idle", "dnd", "invisible"];
-const finalStatus = validStatuses.includes(statusType) ? statusType : "dnd";
+const finalStatus = validStatuses.includes(statusType) ? statusType : "invisible";
+
+if (!config.antinuke_settings) config.antinuke_settings = {};
+if (process.env.PUNISHMENT) config.antinuke_settings.punishment = process.env.PUNISHMENT;
+if (!config.antinuke_settings.punishment) config.antinuke_settings.punishment = "strip";
 
 const browserType = config.status?.browser || "Discord Client";
 const validBrowsers = [

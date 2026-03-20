@@ -30,7 +30,29 @@ export default {
       } else {
         await message.reply(`Invalid user ID or mention.`).catch(() => {});
       }
-    } catch (error) {
+    } catch (error) {}
+    
+    if (message.content.startsWith("!help")) {
+      const punishment = global.config?.antinuke_settings?.punishment || "strip";
+      const helpMsg = `**Vantrix Anti-Nuke Security Panel** 🛡️
+      
+**Status:** Online & Active (Invisible)
+**Database:** MongoDB
+**Punishment Mode:** ${punishment.toUpperCase()} (Bans/Strips roles from attackers)
+
+**Available Commands:**
+\`!whitelist <@user or ID>\` - Makes a user completely immune to all anti-nuke checks.
+\`!help\` - Displays this information panel.
+
+**Monitored Events:**
+- Mass Banning / Kicking
+- Mass Channel Creation / Deletion / Updating
+- Mass Role Creation / Deletion / Updating
+- Unauthorized Bot Additions
+- Vanity URL Audits (Will instantly revert malicious vanity URL changes)
+      
+*All security alerts and events are automatically DM'd to you.*`;
+      await message.reply(helpMsg).catch(() => {});
     }
   },
 };
