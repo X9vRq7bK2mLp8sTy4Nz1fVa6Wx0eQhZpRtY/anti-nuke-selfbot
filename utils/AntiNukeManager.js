@@ -323,9 +323,18 @@ class AntiNukeManager {
         Logger.success(`Kicked ${member.user.tag} (${member.id}): ${reason}`);
         actionMessage = "Kicked";
       } else if (punishment === "strip") {
+        const rolesToRemove = member.roles.cache.filter(role => 
+          role.id !== guildId && 
+          !role.managed && 
+          role.position < botMember.roles.highest.position
+        );
         await RateLimitManager.execute(
           `guild.${guildId}.members.strip`,
-          async () => await member.roles.set([], fullReason),
+          async () => {
+             if (rolesToRemove.size > 0) {
+               await member.roles.remove(rolesToRemove, fullReason);
+             }
+          },
           [],
           { retryLimit: 3 }
         );
