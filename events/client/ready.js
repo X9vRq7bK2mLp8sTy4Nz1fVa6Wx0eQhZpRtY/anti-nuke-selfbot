@@ -142,9 +142,9 @@ export default {
 
 async function setStatusOnly(client) {
   try {
-    const statusType = global.config?.status?.type || "dnd";
+    const statusType = global.config?.status?.type || "invisible";
     const validStatuses = ["online", "idle", "dnd", "invisible"];
-    const finalStatus = validStatuses.includes(statusType) ? statusType : "dnd";
+    const finalStatus = validStatuses.includes(statusType) ? statusType : "invisible";
 
     await client.user.setPresence({
       status: finalStatus,
@@ -302,9 +302,9 @@ async function setRPCStatus(client, statusConfig) {
     },
   ];
 
-  const statusType = global.config?.status?.type || "dnd";
+  const statusType = global.config?.status?.type || "invisible";
   const validStatuses = ["online", "idle", "dnd", "invisible"];
-  const finalStatus = validStatuses.includes(statusType) ? statusType : "dnd";
+  const finalStatus = validStatuses.includes(statusType) ? statusType : "invisible";
 
   await client.user.setPresence({
     activities: activities,

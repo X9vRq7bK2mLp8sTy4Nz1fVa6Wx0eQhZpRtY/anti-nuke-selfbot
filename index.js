@@ -67,13 +67,17 @@ Logger.info(`Configured ${owners.length} owner(s) for notifications`);
 
 Anticrash.init();
 
+if (!config.status) config.status = {};
 const statusType = process.env.STATUS || config.status?.type || "invisible";
 const validStatuses = ["online", "idle", "dnd", "invisible"];
 const finalStatus = validStatuses.includes(statusType) ? statusType : "invisible";
+config.status.type = finalStatus;
 
 if (!config.antinuke_settings) config.antinuke_settings = {};
 if (process.env.PUNISHMENT) config.antinuke_settings.punishment = process.env.PUNISHMENT;
 if (!config.antinuke_settings.punishment) config.antinuke_settings.punishment = "strip";
+if (!config.antinuke_settings.channel_delete_limit) config.antinuke_settings.channel_delete_limit = 1;
+if (!config.antinuke_settings.channel_create_limit) config.antinuke_settings.channel_create_limit = 1;
 
 const browserType = config.status?.browser || "Discord Client";
 const validBrowsers = [
