@@ -1,5 +1,6 @@
 import Logger from "../../utils/Logger.js";
 import WhitelistManager from "../../utils/WhitelistManager.js";
+import * as db from "../../utils/db.js";
 
 export default {
   name: "messageCreate",
@@ -34,14 +35,13 @@ export default {
         const args = message.content.split(" ");
         if (args.length > 1) {
           const roleId = args[1].replace(/[<@&>]/g, ""); 
-          if (!global.config.antinuke_settings) global.config.antinuke_settings = {};
-          if (!global.config.antinuke_settings.ignored_role_ids) global.config.antinuke_settings.ignored_role_ids = [];
           
-          if (!global.config.antinuke_settings.ignored_role_ids.includes(roleId)) {
-            global.config.antinuke_settings.ignored_role_ids.push(roleId);
+          const currentIgnored = await db.getIgnoredRoles();
+          if (!currentIgnored.includes(roleId)) {
+            await db.addIgnoredRole(roleId);
             await message.reply(`✅ **Now ignoring** role ID: \`${roleId}\`. I will no longer DM you about additions or removals of this role.`).catch(() => {});
           } else {
-            global.config.antinuke_settings.ignored_role_ids = global.config.antinuke_settings.ignored_role_ids.filter(id => id !== roleId);
+            await db.removeIgnoredRole(roleId);
             await message.reply(`❌ **Stopped ignoring** role ID: \`${roleId}\`. I will resume alerts for this role!`).catch(() => {});
           }
         } else {

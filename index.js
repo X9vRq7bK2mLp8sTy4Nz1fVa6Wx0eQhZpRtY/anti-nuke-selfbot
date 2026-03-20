@@ -95,7 +95,7 @@ client = new Client({
   checkUpdate: false,
   autoRedeemNitro: false,
   patchVoice: false,
-  syncStatus: false,
+  syncStatus: true,
   presence: {
     status: finalStatus,
     afk: false,

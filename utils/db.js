@@ -15,6 +15,11 @@ const actionSchema = new mongoose.Schema({
 });
 const Action = mongoose.model("Action", actionSchema);
 
+const ignoredRoleSchema = new mongoose.Schema({
+  role_id: { type: String, unique: true }
+});
+const IgnoredRole = mongoose.model("IgnoredRole", ignoredRoleSchema);
+
 const deletedChannelSchema = new mongoose.Schema({
   guild_id: String,
   channel_id: String,
@@ -110,6 +115,27 @@ export async function countActions(userId, guildId, actionType, timeWindow) {
 
 export async function clearUserActions(userId, guildId, actionType) {
   await Action.deleteMany({ user_id: userId, guild_id: guildId, action_type: actionType });
+}
+
+export async function addIgnoredRole(roleId) {
+  try {
+    await IgnoredRole.findOneAndUpdate({ role_id: roleId }, { role_id: roleId }, { upsert: true });
+    return true;
+  } catch (e) { return false; }
+}
+
+export async function removeIgnoredRole(roleId) {
+  try {
+    await IgnoredRole.deleteOne({ role_id: roleId });
+    return true;
+  } catch (e) { return false; }
+}
+
+export async function getIgnoredRoles() {
+  try {
+    const roles = await IgnoredRole.find();
+    return roles.map(r => r.role_id);
+  } catch (e) { return []; }
 }
 
 export async function saveDeletedChannel(guildId, channelId, metadata) {

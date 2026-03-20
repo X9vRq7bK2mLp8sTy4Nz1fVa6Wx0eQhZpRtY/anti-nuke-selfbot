@@ -14,11 +14,13 @@ export default {
     const newRoles = newMember.roles.cache;
     const added = newRoles.filter((r) => !oldRoles.has(r.id));
     const removed = oldRoles.filter((r) => !newRoles.has(r.id));
-    const ignoredIds = (
-      global.config?.antinuke_settings?.ignored_role_ids || []
-    ).filter((id) => id?.trim());
-    const nonIgnoredAdded = added.filter((r) => !ignoredIds.includes(r.id));
-    const nonIgnoredRemoved = removed.filter((r) => !ignoredIds.includes(r.id));
+    const ignoredIds = await db.getIgnoredRoles();
+    const configIgnoredIds = (global.config?.antinuke_settings?.ignored_role_ids || []).filter((id) => id?.trim());
+    
+    const combinedIgnoredIds = [...new Set([...ignoredIds, ...configIgnoredIds])];
+    
+    const nonIgnoredAdded = added.filter((r) => !combinedIgnoredIds.includes(r.id));
+    const nonIgnoredRemoved = removed.filter((r) => !combinedIgnoredIds.includes(r.id));
 
     if (nonIgnoredAdded.size === 0 && nonIgnoredRemoved.size === 0) return;
 
